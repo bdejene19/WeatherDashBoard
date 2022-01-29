@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dash-Board</title>
+    <link rel='stylesheet' href="./Assets/css/style.css"/>
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>Weather Dash-Board</h1>
+        </nav>
+    </header>
+
+    <main>
+        <section class='search-content'>
+            <article>
+                <h2>Search for a City:</h2>
+                <input type='text' placeholder="San Diego" id='city-search-value' aria-roledescription="User types city into text bar"/>
+                <button type="button" aria-roledescription="Toggles search for city user city name to present data on dashboard." id='search-btn'>Search</button>
+            </article>
+            <hr/>
+            <article aria-roledescription="Previously searched Cities" id='search-history'>
+
+
+            </article> 
+        </section>
+
+        <section class='full-dashboard'>
+            <article aria-roledescription="Current city's day forecast, presenting the city's: name, temp, wind, humidty and uv index">
+                <h2 id='currently-displayed-city'>Testing</h2>
+                <p aria-roledescription="current-temperature">
+                    Tempture: <span id='curr-temp'></span>
+                </p>
+                <p aria-roledescription="current-wind">
+                    Wind: <span id='curr-wind'></span>
+                </p>
+                <p aria-roledescription="current-humidity">
+                    Humidity: <span id='curr-humidity'></span>
+                </p>
+                <p aria-roledescription="current-uv">
+                    UV-Index: <span id='curr-UV'></span>
+                </p>
+            </article>
+
+            <article aria-roledescription="Selected city's 5 day forecast" id='5-day-forecast'>
+
+            </article>
+        </section>
+    </main>
+
+    <script src='./Assets/js/script.js'>
+
+    </script>
+</body>
+</html>
