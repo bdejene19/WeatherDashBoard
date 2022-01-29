@@ -60,7 +60,6 @@ const setCurrDayDashboard = (temp, wind, humidity, uvIndex) => {
 }
 
 const setFiveDayDashboard = () => {
-
 }
 const getCityWeatherData = async () => {
     /** receive search value from toggle */
