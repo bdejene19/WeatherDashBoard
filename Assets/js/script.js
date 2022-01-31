@@ -101,7 +101,7 @@ const setCurrDayDashboard = (cityName, temp, wind, humidity, uvVal, icon) => {
     if (uvVal <= 2) {
         bgColor = 'lime';
     } else if (uvVal > 4 && uvVal < 8) {
-        bgColor = 'orangered';
+        bgColor = 'orange';
     } else {
         bgColor = 'red';
     }
