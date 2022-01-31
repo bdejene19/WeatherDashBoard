@@ -54,7 +54,7 @@ const setCurrDayDashboard = (cityName, temp, wind, humidity, uvIndex, icon) => {
     let uvPlaceHolder = document.getElementById('curr-uv');
     
     let placeHolderForData = [cityNamePlaceHolder, tempPlaceHolder, windPlaceHolder, humidityPlaceHolder, uvPlaceHolder];
-    let dataValues = [cityName, `${temp}`, `${wind} MPH`, `${humidity}%`, 'uvIndex']
+    let dataValues = [cityName, `${temp}°C`, `${wind} MPH`, `${humidity}%`, 'uvIndex']
     
     placeHolderForData.forEach((item, index) => {
         if (item !== null) {
@@ -63,7 +63,6 @@ const setCurrDayDashboard = (cityName, temp, wind, humidity, uvIndex, icon) => {
     })
     let currDayBg = document.querySelector('#currDay-dash')
     currDayBg.style.backgroundImage = `url('http://openweathermap.org/img/wn/${icon}@2x.png')`;
-    console.log(icon);
 }
 
 const setFiveDayDashboard = (fiveDayList) => {
@@ -76,13 +75,14 @@ const setFiveDayDashboard = (fiveDayList) => {
      */
     let fiveDayInsertContainer = document.getElementById('five-day-forecast');
     fiveDayInsertContainer.style.display = 'flex';
-
     let currentDate = moment().format('DDD');
+   
     fiveDayList.map(item => {
         let currentDay = item.dt_txt.split(' ');
 
         let nextDay = moment(currentDay[0]);
         let reformattedCurrentDay = moment(currentDay[0]).format('DDD');
+
 
         let itemDate = null
         let itemIcon = null;
@@ -97,19 +97,27 @@ const setFiveDayDashboard = (fiveDayList) => {
             itemTemp = Math.round(item.main.temp - 273);
             itemWind = item.wind.speed;
             itemHumidity = item.main.humidity;
-
-            let fiveDayForecastEl = createFutureDayEl(itemDate, itemIcon, iconDescrip, itemTemp, itemWind, itemHumidity);
-            fiveDayInsertContainer.append(fiveDayForecastEl);
+            
+            let fiveDayInsertLength = fiveDayInsertContainer.children.length;
+            if (fiveDayInsertLength <= 5) {
+                let fiveDayForecastEl = createFutureDayEl(itemDate, itemIcon, iconDescrip, itemTemp, itemWind, itemHumidity);
+                fiveDayInsertContainer.append(fiveDayForecastEl);
+            }
+           
             currentDate = reformattedCurrentDay;
         }
     })
+    
+
 }
 
-const getCityWeatherData = async () => {
+let globalStoreKey = 'testssss'
+
+const getCityWeatherData = async (cityShortcut) => {
     /** receive search value from toggle */
     let searchVal = document.getElementById('city-search-value');
 
-    let inputVal = searchVal.value;
+    let inputVal = typeof(cityShortcut) === 'string' ? cityShortcut : searchVal.value;
     let currWeather = (await getCurrentWeather(inputVal));
     let mainContent = currWeather.main;
     let temp = Math.round(parseInt(mainContent.temp) - 273);
@@ -117,14 +125,64 @@ const getCityWeatherData = async () => {
     let wind = currWeather.wind.speed;
     let uvValue = '';
 
-    console.log(currWeather);
     let searchedCity = `${currWeather.name}, ${currWeather.sys.country}`;
     let currentWeatherIcon = currWeather.weather[0].icon;
     setCurrDayDashboard(searchedCity, temp, wind, humidity, uvValue, currentWeatherIcon);
 
     
     let fiveDay = await getFiveDayForecast(inputVal);
+    let fiveDayInsertContainer = document.getElementById('five-day-forecast');
     setFiveDayDashboard(fiveDay.list);
+
+
+    saveCityToLocalStorage(inputVal);
+}
+
+const loadPastSearches = () => {
+    let pastSearchedCities = localStorage.getItem(globalStoreKey);
+    let tempArr = JSON.parse(pastSearchedCities);
+    console.log(tempArr);
+    let shortcutsContainer = document.getElementById('search-history');
+    tempArr.forEach(city => {
+        let shortcutBtn = document.createElement('button')
+        shortcutBtn.setAttribute('class', 'shortcut-btn');
+        shortcutBtn.setAttribute('value', city);
+        shortcutBtn.textContent = city;
+        shortcutsContainer.append(shortcutBtn);
+    })
+}
+
+let currentlySavedCities = localStorage.getItem(globalStoreKey);
+if (currentlySavedCities !== undefined && currentlySavedCities !== 'undefined' && currentlySavedCities !== null) {
+    loadPastSearches();
+}
+
+const saveCityToLocalStorage = (savedCity) => {
+    let currentlySavedCities = localStorage.getItem(globalStoreKey);
+    if (currentlySavedCities === undefined || currentlySavedCities === 'undefined' || currentlySavedCities === null) {
+        let allSavedCities = [];
+        allSavedCities.push(savedCity);
+        allSavedCities = JSON.stringify(allSavedCities);
+        localStorage.setItem(globalStoreKey, allSavedCities);
+
+    } else {
+        let previouslySavedStr = localStorage.getItem(globalStoreKey);
+        let tempCitiesArr = JSON.parse(previouslySavedStr);
+
+        let alreadySearched = tempCitiesArr.filter(city => city === savedCity);
+        
+        if (alreadySearched.length === 0) {
+            tempCitiesArr.push(savedCity);
+            let citiesStr = JSON.stringify(tempCitiesArr)
+            localStorage.setItem(globalStoreKey, citiesStr);
+
+            let newShortcutBtn = document.createElement('button');
+            newShortcutBtn.setAttribute('class', 'shortcut-btn');
+            newShortcutBtn.textContent = savedCity.slice(0, 1).toUpperCase() + savedCity.slice(1, savedCity.length);
+            let shortcutsContainer = document.getElementById('search-history');
+            shortcutsContainer.append(newShortcutBtn);
+        } 
+    }
 }
 
 const createFutureDayEl = (date, icon, describeIcon, temp, wind, humidity) => {
@@ -138,10 +196,11 @@ const createFutureDayEl = (date, icon, describeIcon, temp, wind, humidity) => {
     let daysWind = document.createElement('p');
     let daysHumidity = document.createElement('p');
 
+
     dateTitle.textContent = date;
     weatherIcon.setAttribute('src', `http://openweathermap.org/img/wn/${icon}@2x.png`);
     weatherIcon.setAttribute('alt', `${describeIcon}`)
-    daysTemp.textContent = `Temperature: ${temp}`;
+    daysTemp.textContent = `Temperature: ${temp}°C`;
     daysWind.textContent = `Wind: ${wind} MPH`;
     daysHumidity.textContent = `Humidity: ${humidity}%`;
     
@@ -152,3 +211,15 @@ const createFutureDayEl = (date, icon, describeIcon, temp, wind, humidity) => {
 
 let searchBtn = document.getElementById('search-btn');
 searchBtn.addEventListener('click', getCityWeatherData)
+
+
+// add event listener to shortcut buttons clicked;
+
+let shortcutsContainer = document.getElementById('search-history');
+shortcutsContainer.addEventListener('click', (e) => {
+    let btnValue = e.target.value;
+
+    if (btnValue) {
+        getCityWeatherData(btnValue)
+    }
+})
