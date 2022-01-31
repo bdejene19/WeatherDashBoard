@@ -37,7 +37,10 @@ const getCurrentWeather = async (searchedCity) => {
         return 'No City Found'
     }
 } 
-
+const getUVIndex = async (lat, long) => {
+    let res = await (await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&exclude={part}&appid=${apiKey}`)).json().catch((e => { console.log('there was an error')}));
+    return res.daily[0].uvi;
+}
 const getFiveDayForecast = async (searchedCity) => {
     let fiveDayData = await (await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${searchedCity}&appid=${apiKey}`)).json();
     if (fiveDayData.cod !== '400') {
@@ -46,23 +49,34 @@ const getFiveDayForecast = async (searchedCity) => {
         return 'No City Found'
     }
 } 
-const setCurrDayDashboard = (cityName, temp, wind, humidity, uvIndex, icon) => {
+const setCurrDayDashboard = (cityName, temp, wind, humidity, uvVal, icon) => {
     let cityNamePlaceHolder = document.getElementById('currently-displayed-city');
     let tempPlaceHolder = document.getElementById('curr-temp');
     let windPlaceHolder = document.getElementById('curr-wind');
     let humidityPlaceHolder = document.getElementById('curr-humidity');
-    let uvPlaceHolder = document.getElementById('curr-uv');
+    let uvPlaceHolder = document.getElementById('curr-UV');
     
+
     let placeHolderForData = [cityNamePlaceHolder, tempPlaceHolder, windPlaceHolder, humidityPlaceHolder, uvPlaceHolder];
-    let dataValues = [cityName, `${temp}°C`, `${wind} MPH`, `${humidity}%`, 'uvIndex']
-    
+    let dataValues = [cityName, `${temp}°C`, `${wind} MPH`, `${humidity}%`, uvVal]
     placeHolderForData.forEach((item, index) => {
         if (item !== null) {
             item.textContent = dataValues[index];
-        }
+        } 
     })
+
+    let bgColor = ''
+    if (uvVal <= 2) {
+        bgColor = 'lime';
+    } else if (uvVal > 2 && uvVal < 3) {
+        bgColor = 'orangered';
+    } else {
+        bgColor = 'red';
+    }
+
+    uvPlaceHolder.style.cssText = `background-color: ${bgColor}; border-radius: 5px; padding: 0.5em 1em; color: white;`
     let currDayBg = document.querySelector('#currDay-dash')
-    currDayBg.style.backgroundImage = `url('http://openweathermap.org/img/wn/${icon}@2x.png')`;
+    currDayBg.style.backgroundImage = `url('https://openweathermap.org/img/wn/${icon}.png')`;
 }
 
 const setFiveDayDashboard = (fiveDayList) => {
@@ -111,7 +125,7 @@ const setFiveDayDashboard = (fiveDayList) => {
 
 }
 
-let globalStoreKey = 'testssss'
+let globalStoreKey = 'cities-saved'
 
 const getCityWeatherData = async (cityShortcut) => {
     /** receive search value from toggle */
@@ -127,11 +141,14 @@ const getCityWeatherData = async (cityShortcut) => {
 
     let searchedCity = `${currWeather.name}, ${currWeather.sys.country}`;
     let currentWeatherIcon = currWeather.weather[0].icon;
+
+    let lat = currWeather.coord.lat;
+    let long = currWeather.coord.lon;
+    uvValue = await getUVIndex(lat, long);
     setCurrDayDashboard(searchedCity, temp, wind, humidity, uvValue, currentWeatherIcon);
 
     
     let fiveDay = await getFiveDayForecast(inputVal);
-    let fiveDayInsertContainer = document.getElementById('five-day-forecast');
     setFiveDayDashboard(fiveDay.list);
 
 
@@ -141,7 +158,6 @@ const getCityWeatherData = async (cityShortcut) => {
 const loadPastSearches = () => {
     let pastSearchedCities = localStorage.getItem(globalStoreKey);
     let tempArr = JSON.parse(pastSearchedCities);
-    console.log(tempArr);
     let shortcutsContainer = document.getElementById('search-history');
     tempArr.forEach(city => {
         let shortcutBtn = document.createElement('button')
@@ -175,14 +191,14 @@ const saveCityToLocalStorage = (savedCity) => {
             tempCitiesArr.push(savedCity);
             let citiesStr = JSON.stringify(tempCitiesArr)
             localStorage.setItem(globalStoreKey, citiesStr);
-
-            let newShortcutBtn = document.createElement('button');
-            newShortcutBtn.setAttribute('class', 'shortcut-btn');
-            newShortcutBtn.textContent = savedCity.slice(0, 1).toUpperCase() + savedCity.slice(1, savedCity.length);
-            let shortcutsContainer = document.getElementById('search-history');
-            shortcutsContainer.append(newShortcutBtn);
         } 
     }
+
+    let newShortcutBtn = document.createElement('button');
+    newShortcutBtn.setAttribute('class', 'shortcut-btn');
+    newShortcutBtn.textContent = savedCity.slice(0, 1).toUpperCase() + savedCity.slice(1, savedCity.length);
+    let shortcutsContainer = document.getElementById('search-history');
+    shortcutsContainer.append(newShortcutBtn);
 }
 
 const createFutureDayEl = (date, icon, describeIcon, temp, wind, humidity) => {
@@ -198,7 +214,7 @@ const createFutureDayEl = (date, icon, describeIcon, temp, wind, humidity) => {
 
 
     dateTitle.textContent = date;
-    weatherIcon.setAttribute('src', `http://openweathermap.org/img/wn/${icon}@2x.png`);
+    weatherIcon.setAttribute('src', `https://openweathermap.org/img/wn/${icon}@2x.png`);
     weatherIcon.setAttribute('alt', `${describeIcon}`)
     daysTemp.textContent = `Temperature: ${temp}°C`;
     daysWind.textContent = `Wind: ${wind} MPH`;
