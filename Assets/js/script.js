@@ -270,18 +270,22 @@ const saveCityToLocalStorage = (savedCity) => {
             tempCitiesArr.push(savedCity);
             let citiesStr = JSON.stringify(tempCitiesArr)
             localStorage.setItem(globalStoreKey, citiesStr);
+
+               // create new button to act as short cut;
+            let newShortcutBtn = document.createElement('button');
+            newShortcutBtn.setAttribute('class', 'shortcut-btn');
+
+            // style text of bvutton and append to shortcuts contatiner
+            newShortcutBtn.textContent = savedCity.slice(0, 1).toUpperCase() + savedCity.slice(1, savedCity.length);
+            let shortcutsContainer = document.getElementById('search-history');
+            shortcutsContainer.append(newShortcutBtn);
         } 
+
+        
     }
 
 
-    // create new button to act as short cut;
-    let newShortcutBtn = document.createElement('button');
-    newShortcutBtn.setAttribute('class', 'shortcut-btn');
-
-    // style text of bvutton and append to shortcuts contatiner
-    newShortcutBtn.textContent = savedCity.slice(0, 1).toUpperCase() + savedCity.slice(1, savedCity.length);
-    let shortcutsContainer = document.getElementById('search-history');
-    shortcutsContainer.append(newShortcutBtn);
+ 
 }
 
 /**
