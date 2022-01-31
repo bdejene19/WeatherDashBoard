@@ -33,7 +33,7 @@ const apiKey = 'f654f7e880965191598d5f9223a4101d';
  * @returns current days weather data if the fetch response is ok. Otherwise, returns 'No location found'.
  */
 const getCurrentWeather = async (searchedCity) => {
-    let currentWeatherData = await (await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${searchedCity}&appid=${apiKey}`)).json().catch((e => { console.log('there was an error')}));
+    let currentWeatherData = await (await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${searchedCity}&appid=${apiKey}`)).json().catch((e => { console.log(e)}));
 
     if (currentWeatherData.cod !== '400') {
         return currentWeatherData;
@@ -50,7 +50,7 @@ const getCurrentWeather = async (searchedCity) => {
  * @returns UV-index of location searched
  */
 const getUVIndex = async (lat, long) => {
-    let res = await (await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&exclude={part}&appid=${apiKey}`)).json().catch((e => { console.log('there was an error')}));
+    let res = await (await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&exclude={part}&appid=${apiKey}`)).json().catch((e => { console.log(e)}));
     return res.daily[0].uvi;
 }
 
@@ -102,10 +102,8 @@ const setCurrDayDashboard = (cityName, temp, wind, humidity, uvVal, icon) => {
     if (uvVal <= 3) {
         bgColor = 'lime';
     } else if (uvVal >= 4 && uvVal <= 8) {
-        console.log('hit else if')
         bgColor = 'orange';
     } else {
-        console.log(uvVal);
         bgColor = 'red';
     }
 
