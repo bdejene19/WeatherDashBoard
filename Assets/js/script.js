@@ -99,11 +99,13 @@ const setCurrDayDashboard = (cityName, temp, wind, humidity, uvVal, icon) => {
     // Assigning UV-indicator color
     let bgColor = ''
     uvVal = parseInt(uvVal);
-    if (uvVal <= 2) {
+    if (uvVal <= 3) {
         bgColor = 'lime';
-    } else if (uvVal > 4 && uvVal < 8) {
+    } else if (uvVal >= 4 && uvVal <= 8) {
+        console.log('hit else if')
         bgColor = 'orange';
     } else {
+        console.log(uvVal);
         bgColor = 'red';
     }
 
