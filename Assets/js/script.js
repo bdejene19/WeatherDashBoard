@@ -98,6 +98,7 @@ const setCurrDayDashboard = (cityName, temp, wind, humidity, uvVal, icon) => {
 
     // Assigning UV-indicator color
     let bgColor = ''
+    uvVal = parseInt(uvVal);
     if (uvVal <= 2) {
         bgColor = 'lime';
     } else if (uvVal > 4 && uvVal < 8) {
@@ -139,13 +140,6 @@ const setFiveDayDashboard = (fiveDayList) => {
 
         let nextDay = moment(currentDay[0]);
         let reformattedCurrentDay = moment(currentDay[0]).format('DDD');
-
-        /** does moving inside if chanage anything?  */
-        // let itemDate = null
-        // let itemIcon = null;
-        // let itemTemp = null;
-        // let itemWind = null;
-        // let itemHumidity = null;
 
         if (currentDate < reformattedCurrentDay) {
 
