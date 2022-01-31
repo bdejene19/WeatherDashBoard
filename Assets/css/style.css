@@ -44,9 +44,7 @@ main {
     color: white;
     margin-bottom: 1em;
 }
-.full-dashboard {
-    border: solid pink 30px;
-    
+.full-dashboard {    
     flex: 1 1 70%;
     display: flex;
     flex-direction: column;
@@ -64,12 +62,21 @@ main {
     row-gap: 1em;
 }
 
+#search-history {
+    padding-top: 1em;
+}
+
+#search-history button {
+    background-color: darkblue
+}
+
 
 
 #five-day-forecast {
     display: none;
     flex-wrap: wrap;
     column-gap: 2em;
+    row-gap: 2em;
     padding: 1em 0;
 }
 #five-day-forecast h2 {
@@ -85,5 +92,6 @@ main {
     display: flex;
     flex-direction: column;
     row-gap: 1em;
+    
 }
 
