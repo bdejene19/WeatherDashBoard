@@ -66,8 +66,13 @@ main {
     padding-top: 1em;
 }
 
+
+
 #search-history button {
     background-color: darkblue
+}
+#search-history button:focus {
+    background-color: teal;
 }
 
 
