@@ -117,3 +117,8 @@ main {
     
 }
 
+@media screen and (max-width: 600px) {
+    #currDay-dash {
+        background-size: none;
+    }
+}

@@ -219,7 +219,7 @@ const getCityWeatherData = async (cityShortcut) => {
 
 
     // save search to local storage;
-    saveCityToLocalStorage(inputVal);
+    saveCityToLocalStorage(searchedCity);
 }
 
 
