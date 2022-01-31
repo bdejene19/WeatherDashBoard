@@ -259,6 +259,7 @@ const saveCityToLocalStorage = (savedCity) => {
         allSavedCities.push(savedCity);
         allSavedCities = JSON.stringify(allSavedCities);
         localStorage.setItem(globalStoreKey, allSavedCities);
+        generateShortcutBtn(savedCity);
 
     } else {
         let previouslySavedStr = localStorage.getItem(globalStoreKey);
@@ -270,22 +271,29 @@ const saveCityToLocalStorage = (savedCity) => {
             tempCitiesArr.push(savedCity);
             let citiesStr = JSON.stringify(tempCitiesArr)
             localStorage.setItem(globalStoreKey, citiesStr);
-
-               // create new button to act as short cut;
-            let newShortcutBtn = document.createElement('button');
-            newShortcutBtn.setAttribute('class', 'shortcut-btn');
-
-            // style text of bvutton and append to shortcuts contatiner
-            newShortcutBtn.textContent = savedCity.slice(0, 1).toUpperCase() + savedCity.slice(1, savedCity.length);
-            let shortcutsContainer = document.getElementById('search-history');
-            shortcutsContainer.append(newShortcutBtn);
+            generateShortcutBtn(savedCity);
         } 
 
         
     }
-
-
  
+}
+
+/**
+ * 
+ * @param {string} shortcutName Value and title of created button element
+ */
+const generateShortcutBtn = (shortcutName) => {
+    // create new button to act as short cut;
+    let newShortcutBtn = document.createElement('button');
+    newShortcutBtn.setAttribute('class', 'shortcut-btn');
+    newShortcutBtn.setAttribute('value', shortcutName);
+
+    // style text of bvutton and append to shortcuts contatiner
+    newShortcutBtn.textContent = shortcutName.slice(0, 1).toUpperCase() + shortcutName.slice(1, shortcutName.length);
+    let shortcutsContainer = document.getElementById('search-history');
+    shortcutsContainer.append(newShortcutBtn);
+
 }
 
 /**
