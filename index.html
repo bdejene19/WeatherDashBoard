@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- title of webpage -->
     <title>Weather Dash-Board</title>
     <!-- link stylesheet -->
     <link rel='stylesheet' href="./Assets/css/style.css"/>
@@ -12,27 +13,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.1/moment.min.js"></script>
 </head>
 <body>
+    <!-- navbar displaying app name -->
     <header>
         <nav>
             <h1>Weather Dash-Board</h1>
         </nav>
     </header>
 
+    <!-- flex direction is row => split into 2 columns -->
+    <!-- first column => search bar/button/history -->
+    <!-- second column => displayed api responses  -->
     <main>
+        <!-- first column -->
         <section class='search-content'>
+
             <article>
                 <h2>Search for a City:</h2>
+                <!-- text area to search location by name => ARIA attributes describing role of HTML element -->
                 <input type='text' placeholder="San Diego" id='city-search-value' aria-roledescription="User types city into text bar"/>
                 <button type="button" aria-roledescription="Toggles search for city user city name to present data on dashboard." id='search-btn'>Search</button>
             </article>
             <hr/>
-            <article aria-roledescription="Previously searched Cities" id='search-history'>
-
-
-            </article> 
+            <!-- empty div to populate search history dynamically -->
+            <article aria-roledescription="Previously searched Cities" id='search-history'></article> 
         </section>
 
+        <!-- second column -->
         <section class='full-dashboard'>
+            <!-- first article contains current day location weather data -->
             <article aria-roledescription="Current city's day forecast, presenting the city's: name, temp, wind, humidty and uv index" id='currDay-dash'>
                 <h2 id='currently-displayed-city'></h2>
                 <p aria-roledescription="current-temperature">
@@ -49,6 +57,7 @@
                 </p>
             </article>
 
+            <!-- second article contains 5-day weather data for location  -->
             <article aria-roledescription="Selected city's 5 day forecast" id='five-day-forecast'>
                 <h2>5-Day Forecast</h2>
 
@@ -56,8 +65,7 @@
         </section>
     </main>
 
-    <script src='./Assets/js/script.js'>
-
-    </script>
+    <!-- link script file to make webpage interactive -->
+    <script src='./Assets/js/script.js'></script>
 </body>
 </html>

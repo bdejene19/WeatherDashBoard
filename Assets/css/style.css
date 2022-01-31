@@ -3,6 +3,8 @@
     --primary-col: darkblue;
     --secondary-col: skyblue
 }
+
+/* reset default browser styling */
 * {
     padding: 0;
     margin: 0;
@@ -10,11 +12,13 @@
 }
 
 
+/* basic page layout */
 body {
     display: flex;
     flex-direction: column;
 }
 
+/* create linear gradient bg-color and align text center */
 header {
     text-align: center;
     padding: 1em 0;
@@ -22,6 +26,7 @@ header {
     background-image: linear-gradient(90deg, var(--secondary-col) 0%, var(--primary-col) 100%);
 }
 
+/* align main content in a row */
 main {
     display: flex;
     flex-wrap: wrap;
@@ -29,33 +34,41 @@ main {
     padding: 1em;
 }
 
+/* search content is only ~1/5 of page size */
 .search-content {
     flex: 1 1 20%;
     
     /* color: black; */
 }
 
+/* make input and button elements span rounded with padding */
 .search-content input, .search-content button {
     padding: 0.75em;
     border-radius: 5px;
 }
+
+/* style search button */
 .search-content button{
     background-color: var(--secondary-col);
     color: white;
     margin-bottom: 1em;
 }
+
+/* main weather content is majority of a screen => displayed in a column fashion */
 .full-dashboard {    
     flex: 1 1 70%;
     display: flex;
     flex-direction: column;
 }
 
+/* set bg-properties of icon bg for current-day related content */
 #currDay-dash {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 }
 
+/* set all artices but 5-day-forecast content into a column */
 .search-content article, .full-dashboard article:first-of-type {
     display: flex;
     flex-direction: column;
@@ -67,16 +80,17 @@ main {
 }
 
 
-
+/* chanaged background-color for searched cities shortcuts */
 #search-history button {
-    background-color: darkblue
+    background-color: var(--primary-col)
 }
+
+/* button bg-color changes on focus for UI intuition  */
 #search-history button:focus {
     background-color: teal;
 }
 
-
-
+/** Hide cards initially => displayed in a flex row in JS => however, set flex-properties in css */
 #five-day-forecast {
     display: none;
     flex-wrap: wrap;
@@ -84,10 +98,13 @@ main {
     row-gap: 2em;
     padding: 1em 0;
 }
+
+/* make title take up full width */
 #five-day-forecast h2 {
     flex: 1 1 100%;
 }
 
+/* weather card styling */
 #five-day-forecast div {
     background-color: rgb(45, 69, 94);
     border-radius: 5px;

@@ -27,6 +27,11 @@
 let cityName = '';
 const apiKey = 'f654f7e880965191598d5f9223a4101d';
 
+/**
+ * 
+ * @param {string} searchedCity 
+ * @returns current days weather data if the fetch response is ok. Otherwise, returns 'No location found'.
+ */
 const getCurrentWeather = async (searchedCity) => {
     let currentWeatherData = await (await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${searchedCity}&appid=${apiKey}`)).json().catch((e => { console.log('there was an error')}));
 
@@ -37,10 +42,23 @@ const getCurrentWeather = async (searchedCity) => {
         return 'No City Found'
     }
 } 
+
+/**
+ * 
+ * @param {string} lat location latitude
+ * @param {string} long location longitude
+ * @returns UV-index of location searched
+ */
 const getUVIndex = async (lat, long) => {
     let res = await (await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&exclude={part}&appid=${apiKey}`)).json().catch((e => { console.log('there was an error')}));
     return res.daily[0].uvi;
 }
+
+/**
+ * 
+ * @param {string} searchedCity City searched by user
+ * @returns Five day forecast data if successful, otherwise, returns 'No location found'
+ */
 const getFiveDayForecast = async (searchedCity) => {
     let fiveDayData = await (await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${searchedCity}&appid=${apiKey}`)).json();
     if (fiveDayData.cod !== '400') {
@@ -49,6 +67,18 @@ const getFiveDayForecast = async (searchedCity) => {
         return 'No City Found'
     }
 } 
+
+/**
+ * Targets elements within current day portion of weather dashboard, and updates values. Empty string by default.
+ * @param {string} cityName Name of city
+ * @param {string} temp Temperature
+ * @param {string} wind Wind speed
+ * @param {string} humidity Humidity
+ * @param {string} uvVal UV-index value
+ * @param {string} icon API generated icon, describing current weather conditions.
+ * 
+ * 
+ */
 const setCurrDayDashboard = (cityName, temp, wind, humidity, uvVal, icon) => {
     let cityNamePlaceHolder = document.getElementById('currently-displayed-city');
     let tempPlaceHolder = document.getElementById('curr-temp');
@@ -57,6 +87,7 @@ const setCurrDayDashboard = (cityName, temp, wind, humidity, uvVal, icon) => {
     let uvPlaceHolder = document.getElementById('curr-UV');
     
 
+    // map placeholder targeted HTML elements => update page with new data
     let placeHolderForData = [cityNamePlaceHolder, tempPlaceHolder, windPlaceHolder, humidityPlaceHolder, uvPlaceHolder];
     let dataValues = [cityName, `${temp}°C`, `${wind} MPH`, `${humidity}%`, uvVal]
     placeHolderForData.forEach((item, index) => {
@@ -65,20 +96,28 @@ const setCurrDayDashboard = (cityName, temp, wind, humidity, uvVal, icon) => {
         } 
     })
 
+    // Assigning UV-indicator color
     let bgColor = ''
     if (uvVal <= 2) {
         bgColor = 'lime';
-    } else if (uvVal > 2 && uvVal < 3) {
+    } else if (uvVal > 4 && uvVal < 8) {
         bgColor = 'orangered';
     } else {
         bgColor = 'red';
     }
 
-    uvPlaceHolder.style.cssText = `background-color: ${bgColor}; border-radius: 5px; padding: 0.5em 1em; color: white;`
+    uvPlaceHolder.style.cssText = `background-color: ${bgColor}; border-radius: 5px; padding: 0.5em 1em; color: white;`;
+
+    // set background-image of current day weather container to descriptive icon;
     let currDayBg = document.querySelector('#currDay-dash')
     currDayBg.style.backgroundImage = `url('https://openweathermap.org/img/wn/${icon}.png')`;
 }
 
+
+/**
+ * Targets 5-day forecast portion of weather dashboard. Maps through API response and displays data to UI.
+ * @param {[]} fiveDayList List of 5-day weather data, to be parsed, manipulated and displayed.
+ */
 const setFiveDayDashboard = (fiveDayList) => {
      /**
      * useful object properties on item
@@ -87,24 +126,35 @@ const setFiveDayDashboard = (fiveDayList) => {
      * .main => .temp, .humidity
      * .wind => .speed
      */
+    // target five-day-forecast container make visible and to later insert elements
     let fiveDayInsertContainer = document.getElementById('five-day-forecast');
     fiveDayInsertContainer.style.display = 'flex';
+
+    // use moment.js to determine when new day has occured in 5-hour 5-day forecast. => prevents use of unnecessary data
     let currentDate = moment().format('DDD');
    
+    // loop through api response => parse content and update UI only if day of the year is different ,
     fiveDayList.map(item => {
         let currentDay = item.dt_txt.split(' ');
 
         let nextDay = moment(currentDay[0]);
         let reformattedCurrentDay = moment(currentDay[0]).format('DDD');
 
+        /** does moving inside if chanage anything?  */
+        // let itemDate = null
+        // let itemIcon = null;
+        // let itemTemp = null;
+        // let itemWind = null;
+        // let itemHumidity = null;
 
-        let itemDate = null
-        let itemIcon = null;
-        let itemTemp = null;
-        let itemWind = null;
-        let itemHumidity = null;
-;
         if (currentDate < reformattedCurrentDay) {
+
+            let itemDate = null;
+            let itemIcon = null;
+            let itemTemp = null;
+            let itemWind = null;
+            let itemHumidity = null;
+
             itemDate = nextDay.format('DD/MM/YY')
             itemIcon = item.weather[0].icon;
             iconDescrip = item.weather[0].description;
@@ -112,12 +162,15 @@ const setFiveDayDashboard = (fiveDayList) => {
             itemWind = item.wind.speed;
             itemHumidity = item.main.humidity;
             
+
+            // measure 5-day-forecast children length to update UI, rather than always appending 5 weather cards every search
             let fiveDayInsertLength = fiveDayInsertContainer.children.length;
             if (fiveDayInsertLength <= 5) {
                 let fiveDayForecastEl = createFutureDayEl(itemDate, itemIcon, iconDescrip, itemTemp, itemWind, itemHumidity);
                 fiveDayInsertContainer.append(fiveDayForecastEl);
             }
            
+            // update current day of 5-day forecast
             currentDate = reformattedCurrentDay;
         }
     })
@@ -125,14 +178,23 @@ const setFiveDayDashboard = (fiveDayList) => {
 
 }
 
+// reusable local storage key
 let globalStoreKey = 'cities-saved'
 
+/**
+ * Asynchronous function retrieving current weather and 5-day-forecast data. Handles data parsing and presentation to UI on any button click in the application
+ * @param {string || event} cityShortcut Optional parameter, used for click events to handle data fetching from shortcuts
+ */
 const getCityWeatherData = async (cityShortcut) => {
     /** receive search value from toggle */
     let searchVal = document.getElementById('city-search-value');
 
+    // checks to see if optional parameter was passed => if not, uses user input search value to make API call
     let inputVal = typeof(cityShortcut) === 'string' ? cityShortcut : searchVal.value;
+
+
     let currWeather = (await getCurrentWeather(inputVal));
+    // parse api response for necessary data 
     let mainContent = currWeather.main;
     let temp = Math.round(parseInt(mainContent.temp) - 273);
     let humidity = mainContent.humidity;
@@ -144,17 +206,26 @@ const getCityWeatherData = async (cityShortcut) => {
 
     let lat = currWeather.coord.lat;
     let long = currWeather.coord.lon;
+
+
+    // helper function to get UV-index
     uvValue = await getUVIndex(lat, long);
+    // generate current-day portion of dashboard
     setCurrDayDashboard(searchedCity, temp, wind, humidity, uvValue, currentWeatherIcon);
 
-    
+    // retrieve five-day forecast data and present it to UI;
     let fiveDay = await getFiveDayForecast(inputVal);
     setFiveDayDashboard(fiveDay.list);
 
 
+    // save search to local storage;
     saveCityToLocalStorage(inputVal);
 }
 
+
+/**
+ * Retrieves data from local storage to display as short cut buttons on page load
+ */
 const loadPastSearches = () => {
     let pastSearchedCities = localStorage.getItem(globalStoreKey);
     let tempArr = JSON.parse(pastSearchedCities);
@@ -168,11 +239,19 @@ const loadPastSearches = () => {
     })
 }
 
+/**
+ * checks to see if there is any local storage currently => if there is, short cut buttons will be created
+ */
 let currentlySavedCities = localStorage.getItem(globalStoreKey);
 if (currentlySavedCities !== undefined && currentlySavedCities !== 'undefined' && currentlySavedCities !== null) {
     loadPastSearches();
 }
 
+
+/**
+ * Generates local storage item if none exists. Otherwise, filters city name through local storage to prevent duplicates. Saved city then persists to local storage item.
+ * @param {string} savedCity 
+ */
 const saveCityToLocalStorage = (savedCity) => {
     let currentlySavedCities = localStorage.getItem(globalStoreKey);
     if (currentlySavedCities === undefined || currentlySavedCities === 'undefined' || currentlySavedCities === null) {
@@ -194,13 +273,27 @@ const saveCityToLocalStorage = (savedCity) => {
         } 
     }
 
+
+    // create new button to act as short cut;
     let newShortcutBtn = document.createElement('button');
     newShortcutBtn.setAttribute('class', 'shortcut-btn');
+
+    // style text of bvutton and append to shortcuts contatiner
     newShortcutBtn.textContent = savedCity.slice(0, 1).toUpperCase() + savedCity.slice(1, savedCity.length);
     let shortcutsContainer = document.getElementById('search-history');
     shortcutsContainer.append(newShortcutBtn);
 }
 
+/**
+ * Generates HTML for displaying weather card data. Text content is set by parameters. Cards are then placed into the DOM
+ * @param {string} date Date of described weather conditions
+ * @param {string} icon Descriptive image of day's conditions
+ * @param {string} describeIcon Alt tag for icon
+ * @param {string} temp Day's temperature
+ * @param {string} wind Day's wind speed
+ * @param {string} humidity Day's humidity
+ * @returns new HTML element acting as weather card, containing data recieved from API
+ */
 const createFutureDayEl = (date, icon, describeIcon, temp, wind, humidity) => {
     let dayForecastContainer = document.createElement('div');
     dayForecastContainer.setAttribute('class', 'single-5day-container');
@@ -224,13 +317,13 @@ const createFutureDayEl = (date, icon, describeIcon, temp, wind, humidity) => {
     return dayForecastContainer;
 }
 
-
+// apply event listener to search button
 let searchBtn = document.getElementById('search-btn');
 searchBtn.addEventListener('click', getCityWeatherData)
 
 
 // add event listener to shortcut buttons clicked;
-
+// applied to container => therefore, validate click event using btnValue ==> btn value is our input for getCityWeatherData
 let shortcutsContainer = document.getElementById('search-history');
 shortcutsContainer.addEventListener('click', (e) => {
     let btnValue = e.target.value;
